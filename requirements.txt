@@ -1,0 +1,12 @@
+pandas
+pyarrow
+numpy
+scipy
+statsmodels
+matplotlib
+seaborn
+scikit-learn
+textblob
+vaderSentiment
+lifelines
+huggingface_hub
