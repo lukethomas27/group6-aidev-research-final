@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Local/raw dataset caches. These are large and should be downloaded separately.
+*.parquet
+data_cache/
+analysis_outputs/
+
+# Local rerun scratch outputs outside the curated RQ result folders.
+/output/
+/figures/
+
+.DS_Store
+Thumbs.db
