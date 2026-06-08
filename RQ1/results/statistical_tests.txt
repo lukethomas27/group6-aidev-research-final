@@ -1,0 +1,8 @@
+vader: Kruskal-Wallis H=178.657, p=1.449e-37
+textblob: Kruskal-Wallis H=132.305, p=1.252e-27
+
+Spearman correlation between sentiment methods:
+                vader  textblob  senticr_oracle
+vader           1.000     0.441           0.075
+textblob        0.441     1.000           0.063
+senticr_oracle  0.075     0.063           1.000
