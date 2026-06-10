@@ -1,0 +1,6 @@
+,Coverage,Scrutiny,Inline intensity,Discussion,Low-friction appr.
+Coverage,1.0,,0.674,0.383,
+Scrutiny,,1.0,0.284,0.121,-0.573
+Inline intensity,0.674,0.284,1.0,0.345,-0.41
+Discussion,0.383,0.121,0.345,1.0,-0.11
+Low-friction appr.,,-0.573,-0.41,-0.11,1.0

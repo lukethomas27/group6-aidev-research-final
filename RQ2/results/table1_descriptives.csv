@@ -1,0 +1,6 @@
+agent,n_prs,pct_covered,median_ttfr_h,median_inline,median_discussion,pct_scrutinized,pct_low_friction
+Claude_Code,459,24.6,12.6,0.0,0.0,9.7,62.8
+Copilot,4970,51.2,1.4,0.0,1.0,23.8,57.1
+Cursor,1541,25.5,3.6,0.0,0.0,5.6,77.9
+Devin,4827,36.9,1.0,0.0,0.0,12.5,69.6
+OpenAI_Codex,21799,5.4,2.3,0.0,0.0,4.9,68.5
