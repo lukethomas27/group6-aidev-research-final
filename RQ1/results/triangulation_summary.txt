@@ -1,0 +1,33 @@
+Triangulation analysis summary
+
+Bootstrap rank stability files:
+analysis_outputs/triangulation_bootstrap_rank_stability.csv
+
+PR-level sentiment by agent:
+              prs_with_discussion  merge_rate  vader_pr_mean  textblob_pr_mean  senticr_negative_pr_mean
+agent                                                                                                   
+Claude_Code                   124       0.468          0.290             0.121                     0.244
+Devin                        1726       0.550          0.225             0.082                     0.188
+Cursor                        278       0.565          0.175             0.109                     0.148
+Copilot                      2927       0.519          0.096             0.057                     0.233
+OpenAI_Codex                  916       0.592          0.096             0.082                     0.129
+
+Merged vs unmerged PR-level sentiment:
+             prs  vader_mean  textblob_mean  senticr_negative_share  discussion_items
+merged                                                                               
+not_merged  2746       0.137          0.056                   0.224             3.352
+merged      3225       0.144          0.085                   0.181             3.944
+
+Method consensus across comment-level and PR-level sentiment signals:
+              mean_rank  top2_count  bottom_count
+agent                                            
+Cursor              2.2           4             0
+Claude_Code         2.4           3             1
+OpenAI_Codex        2.8           2             1
+Devin               3.0           1             0
+Copilot             4.6           0             3
+
+Merge-logit key coefficients:
+vader_mean: coef=0.0768, p=2.968e-01
+senticr_negative_share: coef=-0.4787, p=4.062e-08
+log_discussion_items: coef=0.3936, p=8.615e-20

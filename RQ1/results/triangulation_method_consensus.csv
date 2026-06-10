@@ -1,0 +1,6 @@
+agent,mean_rank,top2_count,bottom_count
+Cursor,2.2,4,0
+Claude_Code,2.4,3,1
+OpenAI_Codex,2.8,2,1
+Devin,3.0,1,0
+Copilot,4.6,0,3
