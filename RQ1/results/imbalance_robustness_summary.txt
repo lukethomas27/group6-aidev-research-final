@@ -1,0 +1,36 @@
+Dataset imbalance robustness summary
+Filtered sentiment items: 21,922
+Equal-agent downsampling N per agent: 434; repetitions: 500
+Within-repo restricted comments: 1,841
+Within-repo restricted repositories: 19
+
+Raw VADER ranking: Claude_Code > Cursor > Devin > OpenAI_Codex > Copilot
+Downsampled VADER ranking: Claude_Code > Cursor > Devin > OpenAI_Codex > Copilot
+Repo-normalized VADER ranking: Claude_Code > Cursor > OpenAI_Codex > Copilot > Devin
+Within-repo VADER ranking: Claude_Code > Devin > Copilot > OpenAI_Codex > Cursor
+Within-repo centered VADER ranking: Claude_Code > Cursor > Copilot > Devin > OpenAI_Codex
+
+Raw SentiCR ranking, lower negative share is better: OpenAI_Codex > Cursor > Devin > Claude_Code > Copilot
+Downsampled SentiCR ranking, lower negative share is better: OpenAI_Codex > Cursor > Devin > Claude_Code > Copilot
+Repo-normalized SentiCR ranking, lower negative share is better: Cursor > OpenAI_Codex > Devin > Copilot > Claude_Code
+Within-repo SentiCR ranking, lower negative share is better: OpenAI_Codex > Devin > Cursor > Copilot > Claude_Code
+Within-repo centered SentiCR ranking, higher centered signal is better: OpenAI_Codex > Devin > Copilot > Cursor > Claude_Code
+
+
+vader repository fixed effects; baseline agent = Copilot
+C(agent)[T.OpenAI_Codex]: coef=-0.0138, p=7.863e-01
+C(agent)[T.Devin]: coef=-0.0740, p=2.264e-01
+C(agent)[T.Cursor]: coef=0.1204, p=4.464e-02
+C(agent)[T.Claude_Code]: coef=0.0990, p=1.082e-01
+
+textblob repository fixed effects; baseline agent = Copilot
+C(agent)[T.OpenAI_Codex]: coef=0.0033, p=9.147e-01
+C(agent)[T.Devin]: coef=-0.0573, p=1.171e-01
+C(agent)[T.Cursor]: coef=0.0072, p=8.400e-01
+C(agent)[T.Claude_Code]: coef=0.0306, p=4.062e-01
+
+senticr_positive_signal repository fixed effects; baseline agent = Copilot
+C(agent)[T.OpenAI_Codex]: coef=0.0408, p=4.080e-01
+C(agent)[T.Devin]: coef=0.0577, p=3.295e-01
+C(agent)[T.Cursor]: coef=0.0120, p=8.355e-01
+C(agent)[T.Claude_Code]: coef=-0.0464, p=4.360e-01
