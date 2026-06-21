@@ -1,0 +1,6 @@
+agent,raw_prs,prs_with_experience,raw_authors,authors_with_experience,experience_coverage_pct
+Copilot,4970,0,1,0,0.0
+Claude_Code,459,458,236,235,99.78213507625271
+Cursor,1541,1541,363,363,100.0
+Devin,4827,4827,1,1,100.0
+OpenAI_Codex,21799,21799,1284,1284,100.0
