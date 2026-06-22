@@ -1,0 +1,3 @@
+sample,outcome,n,median_hours,aic,status
+duration_human_account_linked_no_extreme_pairs,log_review_latency_hours,1429,3.5980555555555553,5748.503834982582,ok
+duration_github_enriched_human_account_linked_no_extreme_pairs,log_review_latency_hours,331,3.4558333333333335,1344.5332897984915,ok
