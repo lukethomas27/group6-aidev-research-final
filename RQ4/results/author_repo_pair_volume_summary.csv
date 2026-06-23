@@ -1,0 +1,5 @@
+agent,author_repo_pairs,extreme_pairs,prs_in_extreme_pairs,total_prs,extreme_pair_pr_share_pct
+Claude_Code,253,2,3,458,0.6550218340611353
+Cursor,434,3,112,1541,7.268007787151201
+Devin,288,10,2023,4827,41.9100890822457
+OpenAI_Codex,1417,17,15019,21799,68.8976558557732

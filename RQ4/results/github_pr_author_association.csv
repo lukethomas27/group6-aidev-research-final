@@ -1,0 +1,16 @@
+agent,author_association,prs
+Claude_Code,CONTRIBUTOR,44
+Claude_Code,COLLABORATOR,21
+Claude_Code,MEMBER,20
+Claude_Code,NONE,17
+Claude_Code,OWNER,15
+Cursor,CONTRIBUTOR,104
+Cursor,MEMBER,82
+Cursor,OWNER,57
+Cursor,COLLABORATOR,29
+Cursor,NONE,8
+OpenAI_Codex,OWNER,522
+OpenAI_Codex,MEMBER,442
+OpenAI_Codex,CONTRIBUTOR,361
+OpenAI_Codex,COLLABORATOR,239
+OpenAI_Codex,NONE,42
