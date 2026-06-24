@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="470" viewBox="0 0 860 470" role="img">
+  <style>
+    text { font-family: Arial, Helvetica, sans-serif; fill: #1F2933; }
+    .title { font-size: 22px; font-weight: 700; }
+    .subtitle { font-size: 13px; fill: #56616B; }
+    .axis { font-size: 12px; fill: #56616B; }
+    .label { font-size: 12px; }
+    .small { font-size: 11px; fill: #56616B; }
+    .value { font-size: 12px; font-weight: 700; }
+    .grid { stroke: #D9DED9; stroke-width: 1; }
+  </style>
+  <rect width="100%" height="100%" fill="white"/>
+<text x="185" y="38" class="title">High-volume author-repo pairs dominate some agents</text>
+<text x="185" y="62" class="subtitle">Share of AIDev-pop PRs in extreme author-repo pairs (&gt;100 observed PRs in AIDev)</text>
+<line x1="185.0" y1="92" x2="185.0" y2="400" class="grid"/>
+<text x="185.0" y="424" class="axis" text-anchor="middle">0%</text>
+<line x1="306.0" y1="92" x2="306.0" y2="400" class="grid"/>
+<text x="306.0" y="424" class="axis" text-anchor="middle">15%</text>
+<line x1="427.0" y1="92" x2="427.0" y2="400" class="grid"/>
+<text x="427.0" y="424" class="axis" text-anchor="middle">30%</text>
+<line x1="548.0" y1="92" x2="548.0" y2="400" class="grid"/>
+<text x="548.0" y="424" class="axis" text-anchor="middle">45%</text>
+<line x1="669.0" y1="92" x2="669.0" y2="400" class="grid"/>
+<text x="669.0" y="424" class="axis" text-anchor="middle">60%</text>
+<line x1="790.0" y1="92" x2="790.0" y2="400" class="grid"/>
+<text x="790.0" y="424" class="axis" text-anchor="middle">75%</text>
+<text x="171" y="134.0" class="label" text-anchor="end">Claude Code</text>
+<rect x="185" y="107" width="5.3" height="44" rx="4" fill="#2A9D8F"/>
+<text x="198.3" y="134.0" class="value" text-anchor="start" fill="#1F2933">0.7%</text>
+<text x="171" y="203.0" class="label" text-anchor="end">Cursor</text>
+<rect x="185" y="176" width="58.6" height="44" rx="4" fill="#457B9D"/>
+<text x="251.6" y="203.0" class="value" text-anchor="start" fill="#1F2933">7.3%</text>
+<text x="171" y="272.0" class="label" text-anchor="end">Devin</text>
+<rect x="185" y="245" width="338.1" height="44" rx="4" fill="#F4A261"/>
+<text x="531.1" y="272.0" class="value" text-anchor="start" fill="#1F2933">41.9%</text>
+<text x="171" y="341.0" class="label" text-anchor="end">OpenAI Codex</text>
+<rect x="185" y="314" width="555.8" height="44" rx="4" fill="#E76F51"/>
+<text x="732.8" y="341.0" class="value" text-anchor="end" fill="white">68.9%</text>
+<text x="185" y="450" class="small">Interpretation: naive agent comparisons are confounded when an agent is concentrated in a small number of repeated author-repository workflows.</text>
+</svg>

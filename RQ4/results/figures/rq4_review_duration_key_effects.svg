@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="480" viewBox="0 0 920 480" role="img">
+  <style>
+    text { font-family: Arial, Helvetica, sans-serif; fill: #1F2933; }
+    .title { font-size: 22px; font-weight: 700; }
+    .subtitle { font-size: 13px; fill: #56616B; }
+    .axis { font-size: 12px; fill: #56616B; }
+    .label { font-size: 12px; }
+    .small { font-size: 11px; fill: #56616B; }
+    .value { font-size: 12px; font-weight: 700; }
+    .grid { stroke: #D9DED9; stroke-width: 1; }
+  </style>
+  <rect width="100%" height="100%" fill="white"/>
+<text x="230" y="38" class="title">Review-duration model: outsiders wait longer</text>
+<text x="230" y="62" class="subtitle">Duration ratios with 95% confidence intervals among reviewed enriched PRs, n=331</text>
+<line x1="230.0" y1="92" x2="230.0" y2="418" class="grid"/>
+<text x="230.0" y="443" class="axis" text-anchor="middle">0.25</text>
+<line x1="320.3" y1="92" x2="320.3" y2="418" class="grid"/>
+<text x="320.3" y="443" class="axis" text-anchor="middle">0.5</text>
+<line x1="410.6" y1="92" x2="410.6" y2="418" class="grid"/>
+<text x="410.6" y="443" class="axis" text-anchor="middle">1</text>
+<line x1="500.9" y1="92" x2="500.9" y2="418" class="grid"/>
+<text x="500.9" y="443" class="axis" text-anchor="middle">2</text>
+<line x1="620.3" y1="92" x2="620.3" y2="418" class="grid"/>
+<text x="620.3" y="443" class="axis" text-anchor="middle">5</text>
+<line x1="710.6" y1="92" x2="710.6" y2="418" class="grid"/>
+<text x="710.6" y="443" class="axis" text-anchor="middle">10</text>
+<line x1="830.0" y1="92" x2="830.0" y2="418" class="grid"/>
+<text x="830.0" y="443" class="axis" text-anchor="middle">25</text>
+<line x1="410.6" y1="92" x2="410.6" y2="418" stroke="#111827" stroke-width="1.4"/>
+<text x="214" y="142.6" class="label" text-anchor="end">Account age</text>
+<line x1="375.7" y1="138.6" x2="441.4" y2="138.6" stroke="#457B9D" stroke-width="3" opacity="0.9"/>
+<circle cx="408.5" cy="138.6" r="6" fill="#457B9D" stroke="white" stroke-width="1.5"/>
+<text x="846" y="142.6" class="small">DR 0.98; p=0.901</text>
+<text x="214" y="189.1" class="label" text-anchor="end">Total churn</text>
+<line x1="405.8" y1="185.1" x2="491.6" y2="185.1" stroke="#F4A261" stroke-width="3" opacity="0.9"/>
+<circle cx="448.7" cy="185.1" r="6" fill="#F4A261" stroke="white" stroke-width="1.5"/>
+<text x="846" y="189.1" class="small">DR 1.34; p=0.082</text>
+<text x="214" y="235.7" class="label" text-anchor="end">Commits</text>
+<line x1="432.8" y1="231.7" x2="503.8" y2="231.7" stroke="#F4A261" stroke-width="3" opacity="0.9"/>
+<circle cx="468.3" cy="231.7" r="6" fill="#F4A261" stroke="white" stroke-width="1.5"/>
+<text x="846" y="235.7" class="small">DR 1.56; p=0.00147</text>
+<text x="214" y="282.3" class="label" text-anchor="end">No repo association</text>
+<line x1="532.5" y1="278.3" x2="825.2" y2="278.3" stroke="#F4A261" stroke-width="3" opacity="0.9"/>
+<circle cx="678.8" cy="278.3" r="6" fill="#F4A261" stroke="white" stroke-width="1.5"/>
+<text x="846" y="282.3" class="small">DR 7.83; p=0.000328</text>
+<text x="214" y="328.9" class="label" text-anchor="end">Claude Code</text>
+<line x1="271.1" y1="324.9" x2="475.4" y2="324.9" stroke="#457B9D" stroke-width="3" opacity="0.9"/>
+<circle cx="373.3" cy="324.9" r="6" fill="#457B9D" stroke="white" stroke-width="1.5"/>
+<text x="846" y="328.9" class="small">DR 0.75; p=0.473</text>
+<text x="214" y="375.4" class="label" text-anchor="end">Cursor</text>
+<line x1="299.6" y1="371.4" x2="437.3" y2="371.4" stroke="#457B9D" stroke-width="3" opacity="0.9"/>
+<circle cx="368.5" cy="371.4" r="6" fill="#457B9D" stroke="white" stroke-width="1.5"/>
+<text x="846" y="375.4" class="small">DR 0.72; p=0.23</text>
+<text x="230" y="462" class="small">Values right of 1 indicate longer time to first human review.</text>
+</svg>
