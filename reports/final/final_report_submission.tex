@@ -1,0 +1,545 @@
+\documentclass[sigconf,nonacm]{acmart}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{xurl}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{adjustbox}
+\usepackage{caption}
+\usepackage{placeins}
+
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.08}
+
+\title{AI Coding Agent Trust and Pull Request Outcomes in Open Source}
+
+\author{Kunwarbir Singh}
+\author{Gabriel Taves}
+\author{Amrinder Singh}
+\author{Luke Thomas}
+\affiliation{\institution{SENG 404 -- Group 6 / Project 6}}
+
+\begin{document}
+
+\begin{abstract}
+AI coding agents now create public pull requests that must pass through ordinary open-source review workflows. We analyze the AIDev and AIDev-pop datasets to ask how agent choice relates to review sentiment, review engagement, acceptance, merge speed, developer context, and dataset imbalance. Across 33,596 AIDev-pop pull requests, raw agent differences are large but not self-explanatory. Sentiment rankings change by measurement method; review coverage and scrutiny vary strongly by agent; Cursor performs well in within-repository acceptance and merge-speed models; and developer account age is not a robust predictor after controls. The strongest cross-cutting explanation is contextual: maintainers appear to respond to reviewability, pull-request scope, repository relationship, and repeated author-repository workflows more than to agent identity alone. We therefore argue against simple agent leaderboards and recommend analyses that model repository context, PR complexity, author association, and dataset imbalance directly.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+AI coding agents are increasingly participating in open-source software development by generating code, opening pull requests, and entering normal review workflows. Unlike private autocomplete tools, agent-authored pull requests become visible public artifacts. Maintainers must decide whether to review, request changes, approve, or merge these contributions. This changes the practical research question from whether an agent can solve benchmark tasks to whether its contributions are reviewable, trusted, and integrated by open-source maintainers.
+
+This project studies agent-authored pull requests as social and technical artifacts. A pull request outcome is shaped by the generated code, but also by reviewer attention, prior repository relationship, project norms, task type, change size, and dataset artifacts. Open-source maintainers do not evaluate AI coding agents through merge decisions alone. Review comments, requested changes, review duration, discussion patterns, and review effort also reveal trust, friction, concern, or approval.
+
+Our main research question is:
+
+\begin{quote}
+To what extent does the choice of AI coding agent affect pull request outcomes, including review sentiment, review engagement, acceptance, review duration, and merge success, across different task categories after accounting for pull request complexity, repository characteristics, developer experience, and dataset imbalance?
+\end{quote}
+
+The work is relevant to maintainers deciding how much oversight agent-authored PRs require, researchers mining software repositories for evidence of AI adoption, and tool builders who may be tempted to summarize agent quality through a single merge-rate score. Our central finding is that a single leaderboard would be misleading. Agent choice matters, but its apparent effect depends on how review response is measured and on the repository context in which the agent is used.
+
+\section{Related Work}
+
+\subsection{Pull Request Review and Contribution Evaluation}
+
+Our study builds on pull-request mining and pull-based development research. Gousios and Zaidman introduced datasets for studying pull-based development, while later work examined how contributors and integrators work in pull-request-centered workflows~\cite{gousios2014dataset,gousios2014exploratory,gousios2016work}. This literature establishes that pull request outcomes are shaped by both technical and social factors, including project norms, reviewer availability, author history, and contribution size.
+
+Tsay, Dabbish, and Herbsleb found that GitHub contribution evaluation depends on social and technical information rather than code alone~\cite{tsay2014influence}. Their follow-up work on discussion showed that evaluation often happens through conversational signals, not only through final merge outcomes~\cite{tsay2014discussion}. These findings motivate our use of multiple outcome families: sentiment, review coverage, scrutiny, merge success, and review latency.
+
+\subsection{Sentiment in Software Engineering}
+
+Software-engineering sentiment analysis is difficult because technical language can confuse general-purpose sentiment tools. Words such as ``bug,'' ``fail,'' or ``invalid'' may describe technical facts rather than emotional negativity. SentiCR was developed specifically for code-review interactions because general tools can misclassify review language~\cite{ahmed2017senticr}. Other work on developer emotion and sentiment similarly warns that construct validity matters when mining software repositories~\cite{calefato2018sentiment,ortu2016emotional}. For this reason, our RQ1 analysis compares general sentiment, code-review-specific negativity, and formal review-state proxies.
+
+\subsection{AI Coding Agents and Mining GitHub}
+
+The AIDev dataset makes agent-authored GitHub pull requests observable at scale~\cite{li2026aidev}. This enables research that goes beyond coding benchmarks by asking how agents perform inside real OSS workflows. However, AIDev also introduces classic mining-software-repositories concerns. Agent activity is not randomly assigned to repositories; some agents operate through service accounts; and some author-repository pairs generate many observations. GHTorrent and related mining work show the value of large-scale GitHub data, but also remind researchers that public repository data is incomplete and socially structured~\cite{gousios2013ghtorrent}. These concerns are central to our Q6 imbalance analysis.
+
+Compared with related approaches, this project contributes three extensions. First, it triangulates review sentiment rather than trusting one sentiment score. Second, it compares agents within shared repositories, partially controlling for project-level culture. Third, it treats dataset imbalance as a substantive validity threat rather than an afterthought.
+
+\section{Data and Methodology}
+
+\subsection{Dataset}
+
+We use AIDev-pop, the enriched subset of AIDev. AIDev-pop contains 33,596 agent-authored pull requests from 2,807 repositories with more than 100 stars. The broader AIDev dataset contains 932,791 PRs across 116,211 repositories, and we use it for author-repository history and concentration checks. The main tables are 
+\texttt{pull\_request.parquet}, 
+\texttt{user.parquet},
+\texttt{repository.parquet}, \newline
+\texttt{pr\_reviews.parquet}, 
+\texttt{pr\_comments.parquet}, \newline
+\texttt{pr\_review\_comments\_v2.parquet}, and \texttt{pr\_timeline.parquet}.
+
+\begin{center}
+\captionof{table}{AIDev-pop agent distribution.}
+\label{tab:agent-distribution}
+\centering
+\small
+\begin{tabularx}{\linewidth}{Xrr>{\raggedright\arraybackslash}p{0.25\linewidth}}
+\toprule
+Agent & PRs & Repositories & Authors/accounts \\
+\midrule
+OpenAI Codex & 21,799 & 1,248 & 1,284 \\
+GitHub Copilot & 4,970 & 1,012 & 1 account in pop metadata \\
+Devin & 4,827 & 288 & 1 service account \\
+Cursor & 1,541 & 327 & 363 \\
+Claude Code & 459 & 213 & 236 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+We also enriched a 2,025-row subset through the GitHub REST API; 2,003 PRs were successfully fetched. The enriched fields include additions, deletions, changed files, commits, author association, state, and merge status. These fields allow us to separate broad experience proxies from concrete PR complexity and repository relationship.
+
+\subsection{Research Questions}
+
+\begin{center}
+\captionof{table}{Research questions and methods.}
+\label{tab:rq-methods}
+\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{0.11\linewidth}>{\raggedright\arraybackslash}p{0.27\linewidth}X}
+\toprule
+ID & Construct & Method \\
+\midrule
+RQ1 & Review sentiment & VADER, TextBlob, SentiCR-style classifier, review-state proxy \\
+RQ2 & Review engagement & Coverage, scrutiny, responsiveness, low-friction approval, survival framing \\
+RQ3 & Within-repository outcomes & Centered acceptance, fixed-effects logit, Cox merge-speed model, specialization metrics \\
+RQ4 & Developer context & Account age, followers, GitHub complexity controls, author association \\
+Q6 & Dataset imbalance & Agent share, repository concentration, high-volume author-repo pairs \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Measures}
+
+The main outcomes are merged status for closed PRs, whether a human review was submitted, whether a human approval was submitted, whether changes were requested, whether there was any human discussion, and time to first human review. Human discussion combines review records, issue-thread comments, and inline review comments after filtering bot/self activity where relevant.
+
+Predictors and controls include agent label, task category, repository stars and forks, repository language, PR creation month, observed prior author-repository PR history, timeline activity, and repository-clustered standard errors. In the GitHub-enriched models we add total churn, changed files, commit count, and \newline \texttt{author\_association}. Developer experience is operationalized as GitHub account age at PR creation, with log follower count as a secondary reputation-like proxy.
+
+\subsection{Robustness Strategy}
+
+We use three robustness ideas across the project. First, construct triangulation: RQ1 compares multiple sentiment constructs. Second, contextual restriction: RQ3 compares agents inside shared repositories rather than relying only on global rates. Third, imbalance control: RQ4 and Q6 exclude extreme author-repository pairs and use repository-clustered standard errors where possible. These are not cosmetic checks; they directly address the course concern that GitHub mining studies often violate simple sampling assumptions.
+
+\FloatBarrier
+\section{Results}
+
+\subsection{RQ1: Review Sentiment Is Method-Sensitive}
+
+RQ1 analyzes 21,922 human external review/comment text items after removing bot comments, PR-author self-comments, empty comments, very short comments, code blocks, URLs, and generated markup. The text comes from inline review comments, PR issue-thread comments, and top-level review bodies.
+
+General sentiment tools rank Claude Code highest and GitHub Copilot lowest. Claude Code has a VADER mean of 0.269, while GitHub Copilot has 0.080. However, code-review-specific and formal review signals tell a different story: OpenAI Codex has the lowest SentiCR-style negative share at 17.8\% and the strongest review-state score, followed by Cursor.
+
+\begin{table}[!htbp]
+\caption{Sentiment by agent. General tone and code-review-specific signals do not rank agents identically.}
+\label{tab:sentiment}
+\centering
+\scriptsize
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrr}
+\toprule
+Agent & VADER & Positive & Negative & SentiCR neg. & Approved \\
+\midrule
+Claude Code & 0.269 & 57.8\% & 13.4\% & 24.7\% & 41.1\% \\
+Cursor & 0.147 & 48.5\% & 22.0\% & 20.1\% & 63.3\% \\
+Devin & 0.141 & 39.0\% & 16.7\% & 22.3\% & 40.3\% \\
+OpenAI Codex & 0.119 & 49.8\% & 23.3\% & 17.8\% & 66.5\% \\
+GitHub Copilot & 0.080 & 36.6\% & 20.6\% & 24.9\% & 36.0\% \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[!htbp]
+\caption{Ranking depends on sentiment method.}
+\label{tab:sentiment-ranking}
+\centering
+\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{0.23\linewidth}X}
+\toprule
+Method & Most positive to least positive \\
+\midrule
+VADER & Claude Code $>$ Cursor $>$ Devin $>$ OpenAI Codex $>$ Copilot \\
+TextBlob & Claude Code $>$ Cursor $>$ OpenAI Codex $>$ Devin $>$ Copilot \\
+SentiCR-style & OpenAI Codex $>$ Cursor $>$ Devin $>$ Claude Code $>$ Copilot \\
+Review-state & OpenAI Codex $>$ Cursor $>$ Claude Code $>$ Devin $>$ Copilot \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Sentiment differences across agents are statistically significant: Kruskal-Wallis tests give $H=178.7$ for VADER ($p \approx 1.4 \times 10^{-37}$) and $H=132.3$ for TextBlob ($p \approx 1.3 \times 10^{-27}$). However, method agreement is limited. VADER and TextBlob correlate moderately, while both have weak agreement with the SentiCR-style classifier. The temporal pattern is also cautious rather than celebratory: review discussion is more positive in the January-April 2025 period than during the high-volume May-July 2025 period, and code-review-specific negative share remains near one quarter of comments.
+
+RQ1 connects directly to merge outcomes. Merged PRs have lower code-review-specific negativity than unmerged PRs: 18.1\% versus 22.4\%. In a logistic regression predicting merge outcome, SentiCR negative share is significantly associated with lower merge odds ($\beta=-0.479$, $p<0.001$), while general VADER tone is not significant. We therefore treat sentiment as one dimension of maintainer response, not as a final trust score.
+
+\FloatBarrier
+\subsection{RQ2: Review Engagement Separates Visibility From Acceptance}
+
+RQ2 studies whether agent-authored PRs enter formal human review workflows. Only 6,004 of 33,596 PRs, or 17.9\%, receive at least one human review. This low overall coverage is the first major result: many AI-authored PRs are merged, closed, or left open without formal review records.
+
+\begin{table}[!htbp]
+\caption{Human review coverage by agent.}
+\label{tab:coverage}
+\centering
+\small
+\begin{tabularx}{\linewidth}{Xrr}
+\toprule
+Agent & PRs & Human review coverage \\
+\midrule
+OpenAI Codex & 21,799 & 5.4\% \\
+Claude Code & 459 & 24.6\% \\
+Cursor & 1,541 & 25.5\% \\
+Devin & 4,827 & 36.9\% \\
+GitHub Copilot & 4,970 & 51.2\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_review_coverage.pdf}
+\caption{Human review coverage is uneven. The low Codex review rate is one reason raw merge rates cannot be read as direct evidence of reviewer trust.}
+\label{fig:coverage}
+\end{figure}
+
+After controlling for task type, repository reputation, language, and commit count, Copilot, Devin, and Cursor remain significantly more likely than Codex to receive human review. Copilot has an odds ratio of 5.99 relative to Codex (95\% CI [3.81, 9.43]), Devin has OR 3.63 [1.94, 6.77], and Cursor has OR 2.25 [1.19, 4.25]. Claude Code does not reach conventional significance, likely because its sample is smaller.
+
+Among reviewed PRs, scrutiny differs strongly. Copilot has the highest changes-requested rate at 23.8\%, followed by Devin at 12.5\%. Codex and Cursor are near 5\%.
+
+\begin{table}[!htbp]
+\caption{Scrutiny among reviewed PRs.}
+\label{tab:scrutiny}
+\centering
+\small
+\begin{tabularx}{\linewidth}{Xr}
+\toprule
+Agent & Changes-requested rate among reviewed PRs \\
+\midrule
+OpenAI Codex & 4.9\% \\
+Cursor & 5.6\% \\
+Claude Code & 9.7\% \\
+Devin & 12.5\% \\
+GitHub Copilot & 23.8\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_scrutiny.pdf}
+\caption{Scrutiny is conditional on human review. Copilot appears inside a stricter review culture, while Codex often receives no formal review.}
+\label{fig:scrutiny}
+\end{figure}
+
+Controlled models show Copilot PRs are 3.40 times more likely than Codex PRs to receive \texttt{CHANGES\_REQUESTED}; Devin PRs are 1.81 times more likely. Cursor and Claude Code do not differ significantly from Codex after repository context is controlled.
+
+Reviewer responsiveness adds another layer. Raw median time to first review is fastest for Devin (1.0 hours) and Copilot (1.4 hours), followed by Codex (2.3 hours), Cursor (3.6 hours), and Claude Code (12.6 hours). Survival framing is necessary because most PRs never receive formal review. The plateau in each curve reflects the unreviewed fraction rather than very late review. Together, coverage, scrutiny, and responsiveness show that review engagement cannot be reduced to merge success.
+
+\FloatBarrier
+\subsection{RQ3: Within-Repository Outcomes Show Contextual Agent Differences}
+
+RQ3 restricts analysis to repositories where multiple agents appear, so repository culture and maintainer strictness are more controlled. At threshold $k=5$, 37 repositories and 2,481 PRs qualify; at $k=10$, 17 repositories and 1,456 PRs qualify. Codex is present in nearly every qualifying repository and is therefore the reference agent in the inferential models.
+
+\begin{table}[!htbp]
+\caption{Within-repository panel feasibility.}
+\label{tab:within-feasibility}
+\centering
+\small
+\begin{tabularx}{\linewidth}{Xrr}
+\toprule
+Measure & $k=5$ & $k=10$ \\
+\midrule
+Qualifying repositories & 37 & 17 \\
+PRs in working panel & 2,481 & 1,456 \\
+Codex present in repos & 30 & 13 \\
+Cursor present in repos & 21 & 10 \\
+Devin present in repos & 17 & 11 \\
+Copilot present in repos & 10 & 3 \\
+Claude Code present in repos & 4 & 0 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+In fixed-effects logit models using Codex as the reference, Cursor has higher acceptance odds than Codex: adjusted OR 2.01 at $k=5$ and 3.23 at $k=10$. GitHub Copilot has lower acceptance: adjusted OR 0.25 at $k=5$ and 0.37 at $k=10$. Devin is slightly below Codex but much closer than Copilot. Claude Code cannot be included in the logit because it creates separation in the small qualifying subset, but it remains in descriptive and specialization analyses.
+
+\begin{table}[!htbp]
+\caption{Within-repository acceptance and merge-speed models. Codex is the reference agent.}
+\label{tab:rq3-models}
+\centering
+\scriptsize
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrr}
+\toprule
+Agent & Adj. OR $k=5$ & Adj. OR $k=10$ & HR $k=5$ & HR $k=10$ \\
+\midrule
+Cursor & 2.01 & 3.23 & 1.45 & 1.56 \\
+Devin & 0.78 & 0.94 & 0.78 & 0.77 \\
+GitHub Copilot & 0.25 & 0.37 & 0.94 & 0.70 \\
+Claude Code & not estimable & -- & 0.97 & -- \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Merge-speed models reinforce the same pattern. Cox models stratified by repository show Cursor merging faster than Codex, while Devin merges slower. Larger PRs merge more slowly, with about a 13--14\% lower merge hazard per unit of log LOC. This connects RQ3 to RQ4: PR size and reviewability are part of the mechanism through which agent-authored PRs succeed or fail.
+
+Agents also specialize. Task-type specialization, measured with Jensen-Shannon divergence between an agent's task mix and its repository's overall task mix, is modest but interpretable. Devin is feature-skewed, Copilot leans toward fixes and CI/build, Cursor does more documentation and fixes, Codex is the most balanced, and Claude Code leans toward features and refactors on a small sample. Size specialization is clearer: median raw LOC changed at $k=5$ is Codex 57, Copilot 74, Devin 150, Cursor 162, and Claude Code 620. Because Cursor and Devin both make larger PRs but have opposite acceptance and speed patterns, size alone cannot explain the within-repository outcome differences.
+
+\begin{table}[!htbp]
+\caption{Within-repository specialization signals at $k=5$.}
+\label{tab:specialization}
+\centering
+\scriptsize
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{0.22\linewidth}rrX}
+\toprule
+Agent & Task JSD & Median LOC & Interpretation \\
+\midrule
+Claude Code & 0.381 & 620 & Largest; feature/refactor skew; thin sample \\
+Cursor & 0.286 & 162 & Larger PRs; docs/fix tendency; strong outcomes \\
+GitHub Copilot & 0.264 & 74 & Fix and CI/build tendency; low acceptance \\
+OpenAI Codex & 0.250 & 57 & Smallest and most balanced \\
+Devin & 0.232 & 150 & Feature-skewed; slower merges \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\FloatBarrier
+\subsection{RQ4: Developer Experience Is Weaker Than Repository Relationship}
+
+RQ4 asks whether developer experience changes how AI-generated PRs are reviewed and accepted. Developer experience is measured as GitHub account age at PR creation, with followers as a secondary reputation proxy. In the GitHub-enriched, human-account-linked, non-extreme sample, account age is not significant for human review, approval, human discussion, merge success, or review duration.
+
+The enriched sample also shows why controlling for PR complexity and author association is necessary. Claude Code PRs are much larger by median churn and changed files, while OpenAI Codex PRs are smaller and more often submitted from owner, member, or collaborator associations.
+
+\begin{table}[!htbp]
+\caption{GitHub-enriched PR complexity by agent.}
+\label{tab:enriched-complexity}
+\centering
+\scriptsize
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrr}
+\toprule
+Agent & Enriched PRs & Churn & Files & Commits & Owner/member/collab \\
+\midrule
+Claude Code & 117 & 561 & 7 & 2 & 47.9\% \\
+Cursor & 280 & 120 & 3 & 2 & 60.0\% \\
+OpenAI Codex & 1,606 & 47 & 2 & 1 & 74.9\% \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+In the enriched merge model, total churn lowers merge odds (OR 0.64), commits increase merge odds (OR 1.29), OWNER authors have much higher merge odds than ordinary contributors (OR 2.45), and authors with no repository association have much lower merge odds (OR 0.05). Claude Code and Cursor do not show stable merge advantages over OpenAI Codex once these controls are included.
+
+\begin{table*}[!t]
+\caption{GitHub-enriched controlled merge model, closed PRs only ($n=1,818$).}
+\label{tab:merge-effects}
+\centering
+\small
+\begin{tabularx}{0.82\textwidth}{Xrrr}
+\toprule
+Effect & OR & 95\% CI & $p$ \\
+\midrule
+Account age, per SD & 1.13 & [0.92, 1.40] & 0.248 \\
+GitHub total churn, log1p per SD & 0.64 & [0.53, 0.77] & $<0.001$ \\
+GitHub commits, log1p per SD & 1.29 & [1.08, 1.55] & 0.006 \\
+OWNER vs CONTRIBUTOR & 2.45 & [1.62, 3.71] & $<0.001$ \\
+NONE vs CONTRIBUTOR & 0.05 & [0.01, 0.17] & $<0.001$ \\
+Claude Code vs Codex & 1.87 & [0.85, 4.16] & 0.122 \\
+Cursor vs Codex & 1.07 & [0.64, 1.78] & 0.788 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_merge_effects.pdf}
+\caption{Controlled merge model key effects. Repository relationship and PR complexity dominate broad account age and agent label.}
+\label{fig:merge-effects}
+\end{figure}
+
+Review duration tells the same story. Account age and agent choice do not robustly predict review duration. More commits are associated with longer time to first human review, and authors with no GitHub association to the repository wait substantially longer.
+
+\begin{table*}[!t]
+\caption{GitHub-enriched review-duration model among reviewed PRs ($n=331$). Duration ratios above 1 mean longer time to first human review.}
+\label{tab:duration}
+\centering
+\small
+\begin{tabularx}{0.82\textwidth}{Xrrr}
+\toprule
+Effect & Duration ratio & 95\% CI & $p$ \\
+\midrule
+Account age, per SD & 0.98 & [0.76, 1.27] & 0.901 \\
+GitHub total churn, log1p per SD & 1.34 & [0.96, 1.86] & 0.082 \\
+GitHub commits, log1p per SD & 1.56 & [1.19, 2.04] & 0.001 \\
+NONE vs CONTRIBUTOR & 7.83 & [2.55, 24.09] & $<0.001$ \\
+Claude Code vs Codex & 0.75 & [0.34, 1.64] & 0.473 \\
+Cursor vs Codex & 0.72 & [0.43, 1.23] & 0.230 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\FloatBarrier
+\subsection{Q6: Dataset Imbalance Is a Validity Threat}
+
+Q6 examines imbalance directly. OpenAI Codex accounts for 64.9\% of AIDev-pop PRs, while Claude Code accounts for only 1.4\%. The imbalance is not only about volume: 68.9\% of Codex PRs and 41.9\% of Devin PRs fall into extreme author-repository pairs, defined as pairs with more than 100 observed PRs in the broader AIDev dataset. Removing extreme pairs changes Codex's closed-PR merge rate from 85.8\% to 77.5\%, an 8.3 percentage-point drop.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_imbalance.pdf}
+\caption{Agent volume and repeated author-repository workflows are uneven. This supports repository-clustered and non-extreme robustness checks.}
+\label{fig:imbalance}
+\end{figure}
+
+\begin{table}[!htbp]
+\caption{Q6 imbalance audit.}
+\label{tab:q6}
+\centering
+\scriptsize
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrr}
+\toprule
+Agent & PR share & Extreme-pair share & Raw merge & Non-extreme merge & Change \\
+\midrule
+OpenAI Codex & 64.9\% & 68.9\% & 85.8\% & 77.5\% & -8.3 pp \\
+GitHub Copilot & 14.8\% & 7.4\% & 55.0\% & 55.0\% & -0.0 pp \\
+Devin & 14.4\% & 41.9\% & 55.5\% & 53.2\% & -2.3 pp \\
+Cursor & 4.6\% & 7.3\% & 74.6\% & 73.3\% & -1.3 pp \\
+Claude Code & 1.4\% & 0.7\% & 71.3\% & 71.1\% & -0.2 pp \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+This Q6 result closes the loop back to the earlier questions. If one agent is mostly observed in repeated owner-driven workflows and another is mostly observed in review-heavy external contribution workflows, then raw differences in sentiment, review, or merge rates are not clean estimates of agent quality. Dataset imbalance is therefore a substantive result, not merely a nuisance variable.
+
+\FloatBarrier
+\section{Discussion}
+
+\subsection{Connecting the Research Questions}
+
+The individual questions connect around one central lesson: maintainer trust is not reducible to agent identity. RQ1 shows that the apparent sentiment winner changes when the construct changes. RQ2 shows that review visibility and scrutiny differ before acceptance is even considered. RQ3 shows that inside the same repositories some agent differences survive controls. RQ4 shows that broad developer tenure is less important than concrete repository relationship and PR complexity. Q6 explains why all of these findings require imbalance checks.
+
+The most important synthesis is the difference between visibility, friction, and acceptance. Copilot receives the most formal review and scrutiny, but that does not make it the strongest acceptance performer. Codex has low formal review coverage, but that does not necessarily mean maintainers trust it less; it may reflect owner-driven workflows and repeated small changes. Cursor performs strongly in within-repository acceptance and speed, but the enriched analysis reminds us that agent effects can weaken once author association and PR complexity are included.
+
+These connections make the report's claim more nuanced than ``agent X is best.'' The better claim is that agents occupy different workflow positions. Some agents appear in stricter review cultures; some appear in high-volume owner workflows; some are associated with larger changes; and some have small samples. Treating those positions as interchangeable would produce misleading rankings.
+
+\subsection{Implications for Maintainers and Tool Builders}
+
+For maintainers, the practical implication is to focus review policy on risk and context. Agent-authored PRs with large churn, many files, outsider author association, security or performance scope, or repeated automated submission patterns deserve more scrutiny. Lower-risk documentation, test, or owner-submitted maintenance changes may reasonably move through lighter review workflows. This is more actionable than treating every AI-authored PR as equally risky.
+
+For tool builders, the results imply that improving reviewability and fit with maintainer workflows may matter as much as improving raw code-generation capability. The strongest predictors are often not the agent label but whether the PR is scoped, understandable, iterative, and submitted by an actor with standing in the project.
+
+\subsection{Implications for Research}
+
+For researchers, this is a warning about mining GitHub data in the AI-agent era. Agent-authored PRs are not independent samples from a uniform population. Some agents are deployed as centralized service accounts, some are used in repeated repository automation, and some have thin support. Course concepts about sampling assumptions, construct validity, and social/technical confounding are therefore not abstract concerns; they change the conclusions.
+
+Future AI-agent mining studies should report coverage and imbalance diagnostics before presenting agent comparisons. Repository clustering, author-repository history, survival analysis for unreviewed PRs, and sensitivity checks for centralized accounts should be standard rather than optional.
+
+\FloatBarrier
+\section{Limitations}
+
+The largest limitation is that all results are observational. Agent labels are not randomly assigned to projects, tasks, or authors, so the models estimate associations rather than causal effects. The controlled results reduce obvious confounding, but unobserved factors such as maintainer workload, private communication, CI status, or human editing of agent output could still explain part of the observed differences.
+
+Other limitations are also important. AIDev-pop includes popular repositories only, so results may not generalize to small or private projects. Task categories are keyword-based controls rather than gold labels. Sentiment methods measure different constructs and can misread technical language. GitHub account age and followers are broad proxies for experience and reputation. The GitHub-enriched complexity model uses a 2,003-PR subset rather than the full AIDev-pop dataset. Some agents have centralized accounts or thin samples, especially Devin, Copilot author metadata, and Claude Code. Review absence is ambiguous: it can indicate trust, automation, low scrutiny, or missing formal review practices.
+
+There is also a construct-validity limitation around human involvement. A PR labeled with an agent may be fully generated, heavily edited by a human, or opened through a bot account. The dataset records public GitHub artifacts, not the full human-agent workflow behind them. We therefore phrase conclusions around observed agent-associated PR workflows rather than hidden code-generation quality.
+
+\FloatBarrier
+\section{Software Engineering and Reproducibility}
+
+The project was organized as a reproducible mining study rather than a one-off spreadsheet analysis. Cached AIDev tables, derived summaries, model outputs, and report figures are kept as separate artifacts so the reported results can be traced back to generated files. The main analysis script constructs experience proxies, task categories, author-repository history, concentration checks, controlled logistic models, and duration models. Separate scripts enrich and summarize GitHub PR metrics.
+
+This structure supports marker reproducibility: a reader can inspect the cached inputs, rerun the scripts, compare generated CSV files with the report tables, and trace each reported number back to an output artifact. The final report package also includes a prompt log for AI assistance and a replication manifest listing inputs, scripts, outputs, and figures.
+
+\FloatBarrier
+\section{Conclusion and Future Work}
+
+This project finds that AI coding agent outcomes in OSS are multidimensional. Cursor performs strongly in within-repository acceptance and merge speed, OpenAI Codex and Cursor look strongest under code-review-specific sentiment and formal review signals, Copilot receives the most review coverage and scrutiny, and Claude Code receives the warmest general sentiment but has a small sample. These results are not contradictions. They show that review sentiment, review engagement, acceptance, merge speed, PR complexity, and repository context measure different parts of the open-source workflow.
+
+The final answer to the main question is therefore conditional: agent choice matters, but not as a stand-alone explanation. The strongest evidence points to context-driven trust. Maintainers appear to reward PRs that are scoped, reviewable, and submitted from a position of repository standing. Future work should expand the GitHub enrichment, use stronger task labeling, model maintainer identity and review-team workload, and examine qualitative review comments to understand why some agent-authored PRs receive fast acceptance while others receive scrutiny or silence.
+
+\bibliographystyle{ACM-Reference-Format}
+\begin{thebibliography}{10}
+
+\bibitem{li2026aidev}
+Hao Li, Haoxiang Zhang, and Ahmed E. Hassan. 2026.
+\newblock AIDev: Studying AI Coding Agents on GitHub.
+\newblock \emph{arXiv:2602.09185}. DOI: 10.48550/arXiv.2602.09185.
+
+\bibitem{gousios2014dataset}
+Georgios Gousios and Andy Zaidman. 2014.
+\newblock A dataset for pull-based development research.
+\newblock In \emph{Proceedings of MSR 2014}. ACM, 368--371. DOI: 10.1145/2597073.2597122.
+
+\bibitem{gousios2014exploratory}
+Georgios Gousios, Martin Pinzger, and Arie van Deursen. 2014.
+\newblock An exploratory study of the pull-based software development model.
+\newblock In \emph{Proceedings of ICSE 2014}. ACM, 345--355. DOI: 10.1145/2568225.2568260.
+
+\bibitem{gousios2016work}
+Georgios Gousios, Margaret-Anne Storey, and Alberto Bacchelli. 2016.
+\newblock Work practices and challenges in pull-based development: the contributor's perspective.
+\newblock In \emph{Proceedings of ICSE 2016}. ACM, 285--296. DOI: 10.1145/2884781.2884826.
+
+\bibitem{tsay2014influence}
+Jason Tsay, Laura Dabbish, and James Herbsleb. 2014.
+\newblock Influence of social and technical factors for evaluating contribution in GitHub.
+\newblock In \emph{Proceedings of ICSE 2014}. ACM. DOI: 10.1145/2568225.2568315.
+
+\bibitem{tsay2014discussion}
+Jason Tsay, Laura Dabbish, and James Herbsleb. 2014.
+\newblock Let's talk about it: evaluating contributions through discussion in GitHub.
+\newblock In \emph{Proceedings of FSE 2014}. ACM. DOI: 10.1145/2635868.2635882.
+
+\bibitem{ahmed2017senticr}
+Toufique Ahmed, Amiangshu Bosu, Anindya Iqbal, and Shahram Rahimi. 2017.
+\newblock SentiCR: A customized sentiment analysis tool for code review interactions.
+\newblock In \emph{Proceedings of ASE 2017}. IEEE/ACM, 106--111. DOI: 10.1109/ASE.2017.8115623.
+
+\bibitem{calefato2018sentiment}
+Fabio Calefato, Filippo Lanubile, and Nicole Novielli. 2018.
+\newblock Sentiment polarity detection for software development.
+\newblock \emph{Empirical Software Engineering} 23, 3, 1352--1382.
+
+\bibitem{ortu2016emotional}
+M. Ortu, A. Murgia, G. Destefanis, P. Tourani, R. Tonelli, M. Marchesi, and B. Adams. 2016.
+\newblock The emotional side of software developers in JIRA.
+\newblock In \emph{Proceedings of MSR 2016}.
+
+\bibitem{gousios2013ghtorrent}
+Georgios Gousios. 2013.
+\newblock The GHTorrent dataset and tool suite.
+\newblock In \emph{Proceedings of MSR 2013}. IEEE, 233--236.
+
+\end{thebibliography}
+
+\FloatBarrier
+\appendix
+
+\section{Supplementary Materials and Replication Package}
+
+The replication package is organized in the project workspace and should be uploaded to the team GitHub/course repository. It includes the cached AIDev tables, analysis scripts, GitHub-enrichment scripts, generated model outputs, report figures, final PDF/LaTeX source, AI-assistance prompt log, and replication manifest. Insert the final GitHub/course repository URL before Brightspace submission.
+
+\section{Team Contributions}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{0.25\linewidth}X}
+\toprule
+Member & Contribution \\
+\midrule
+Amrinder Singh & RQ1 review-sentiment analysis using VADER, TextBlob, SentiCR-style classification, and review-state proxies. \\
+Gabriel Taves & RQ2 review-engagement analysis, including review coverage, scrutiny, responsiveness, and low-friction approval. \\
+Luke Thomas & RQ3 within-repository comparison, acceptance models, merge-speed models, and specialization analysis. \\
+Kunwarbir Singh & RQ4 developer-experience and GitHub-enriched PR-complexity models; Q6 imbalance and robustness audit; final synthesis support. \\
+All members & Shared framing, dataset interpretation, final integration, discussion, limitations, and presentation preparation. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\end{document}
+
