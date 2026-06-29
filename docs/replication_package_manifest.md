@@ -2,6 +2,8 @@
 
 This repository contains the replication artifacts for the SENG 404 Group 6 final report.
 
+GitHub repository: https://github.com/lukethomas27/group6-aidev-research-final
+
 ## Inputs
 
 - Raw AIDev parquet files are not committed because several exceed normal GitHub file-size limits. See `DATA.md` for placement instructions.
@@ -18,13 +20,13 @@ This repository contains the replication artifacts for the SENG 404 Group 6 fina
 
 ## Outputs
 
+- `RQ1/results/*` and `RQ1/figures/*`: generated sentiment tables, robustness outputs, and figures.
 - `RQ2/results/*`: generated review-engagement tables and figures.
 - `RQ3/results/*`: generated within-repository results summary and figures.
 - `RQ4/results/*`: generated model coefficients, model metadata, task summaries, robustness outputs, and figures.
 - `reports/final/Project_Final_Report_ACM.pdf`: final report PDF.
+- `reports/final/build_acm_final_report.py`: generator used for the final PDF version.
 - `reports/final/final_report_submission.tex`: ACM-style LaTeX source.
+- `reports/proposal/SENG404_Proposal_Group_6.pdf`: original project proposal artifact.
+- `reports/interim/Interim_Report_Group_6.pdf`: interim report artifact.
 - `Prompts.md`: AI assistance log.
-
-## Manual Step Before Submission
-
-After pushing, insert the final GitHub repository URL into Appendix A of the final report if the course requires the URL inside the PDF.

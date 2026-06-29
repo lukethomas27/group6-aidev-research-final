@@ -522,7 +522,28 @@ Georgios Gousios. 2013.
 
 \section{Supplementary Materials and Replication Package}
 
-The replication package is organized in the project workspace and should be uploaded to the team GitHub/course repository. It includes the cached AIDev tables, analysis scripts, GitHub-enrichment scripts, generated model outputs, report figures, final PDF/LaTeX source, AI-assistance prompt log, and replication manifest. Insert the final GitHub/course repository URL before Brightspace submission.
+The replication package is organized in the final Group 6 GitHub repository submitted with this PDF. It includes the AIDev dataset reference, data-placement notes, analysis scripts, GitHub-enrichment scripts, generated model outputs, report figures, report source, AI-assistance prompt log, and replication manifest. Raw AIDev parquet tables are not committed because of size limits; \texttt{DATA.md} describes where to place them for reruns.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{0.23\linewidth}X}
+\toprule
+Artifact & Location / description \\
+\midrule
+Project repository & \url{https://github.com/lukethomas27/group6-aidev-research-final}; root \texttt{README.md} maps the replication package. \\
+Dataset & \url{https://huggingface.co/datasets/hao-li/AIDev} \\
+Root docs & \texttt{README.md}; \texttt{DATA.md}; \texttt{CONTRIBUTIONS.md}; \texttt{requirements.txt}; \texttt{Prompts.md} \\
+Replication docs & \texttt{docs/replication\_package\_manifest.md}; \texttt{docs/final\_report\_rubric\_checklist.md} \\
+RQ1 sentiment & \texttt{RQ1/scripts/*.py}; \texttt{RQ1/results/*}; \texttt{RQ1/figures/*.png} \\
+RQ2 engagement & \texttt{RQ2/scripts/analysis\_pipeline.py}; \texttt{RQ2/results/*} \\
+RQ3 within-repo & \texttt{RQ3/scripts/*}; \texttt{RQ3/results/results.md}; \texttt{RQ3/results/figures/*.png} \\
+RQ4/Q6 context & \texttt{RQ4/scripts/*}; \texttt{RQ4/data/github\_pr\_metrics.csv}; \texttt{RQ4/results/*} \\
+Report files & \texttt{reports/final/Project\_Final\_Report\_ACM.pdf}; \texttt{reports/final/build\_acm\_final\_report.py}; \texttt{reports/final/final\_report\_submission.tex}; \texttt{reports/final/final\_report.md} \\
+Proposal & \texttt{reports/proposal/SENG404\_Proposal\_Group\_6.pdf} \\
+Interim artifact & \texttt{reports/interim/Interim\_Report\_Group\_6.pdf} \\
+\bottomrule
+\end{tabularx}
+\end{center}
 
 \section{Team Contributions}
 
@@ -542,4 +563,3 @@ All members & Shared framing, dataset interpretation, final integration, discuss
 \end{center}
 
 \end{document}
-

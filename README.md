@@ -2,6 +2,8 @@
 
 This repository contains the replication package for Group 6's SENG 404 final project on AI coding agents and pull request outcomes in the AIDev dataset.
 
+GitHub repository: https://github.com/lukethomas27/group6-aidev-research-final
+
 ## Research Questions
 
 | Folder | Owner | Focus |
@@ -14,7 +16,8 @@ This repository contains the replication package for Group 6's SENG 404 final pr
 ## Repository Layout
 
 - `RQ1/` through `RQ4/`: scripts, generated results, figures, and supporting reports for each research question.
-- `reports/final/`: final report PDF, Markdown draft, and ACM LaTeX source.
+- `reports/final/`: final report PDF, PDF generator, supporting Markdown summary, and ACM LaTeX source.
+- `reports/proposal/`: original project proposal artifact.
 - `reports/interim/`: interim report artifact.
 - `docs/`: replication-package and rubric notes.
 - `Prompts.md`: AI assistance log used for report synthesis and checks.

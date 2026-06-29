@@ -10,3 +10,5 @@ textblob
 vaderSentiment
 lifelines
 huggingface_hub
+Pillow
+reportlab

@@ -1,7 +1,7 @@
 Triangulation analysis summary
 
 Bootstrap rank stability files:
-analysis_outputs/triangulation_bootstrap_rank_stability.csv
+RQ1/results/triangulation_bootstrap_rank_stability.csv
 
 PR-level sentiment by agent:
               prs_with_discussion  merge_rate  vader_pr_mean  textblob_pr_mean  senticr_negative_pr_mean
